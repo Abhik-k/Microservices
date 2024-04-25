@@ -20,6 +20,7 @@ import com.lcwd.user.service.enteties.Rating;
 import com.lcwd.user.service.enteties.User;
 import com.lcwd.user.service.exception.ResourceNotFoundException;
 import com.lcwd.user.service.repository.UserRepository;
+import com.lcwd.user.service.services.external.HotelService;
 
 @Service
 public class UserServiceImpl implements UserService{
@@ -27,6 +28,8 @@ public class UserServiceImpl implements UserService{
 	@Autowired
 	private UserRepository userRepository;
 	
+	@Autowired
+	private HotelService hotelService;
 	//RestTemplate
 	@Autowired
 	private RestTemplate restTemplate;
@@ -69,11 +72,16 @@ public class UserServiceImpl implements UserService{
 			//api call to Hotel Service to get the hotel
 			//http://localhost:8082/hotel
 			
-			ResponseEntity<Hotel> forEntity=restTemplate.getForEntity("http://HOTELSERVICE/hotel/"+rating.getHotelId(), Hotel.class);
+//			ResponseEntity<Hotel> forEntity=restTemplate.getForEntity("http://HOTELSERVICE/hotel/"+rating.getHotelId(), Hotel.class);
+//			
+//			Hotel hotel=forEntity.getBody();
+//			
+//			logger.info("Response status Code: {} ",forEntity.getStatusCode());
 			
-			Hotel hotel=forEntity.getBody();
+			//Using Feign Client
+			//ResponseEntity<Hotel> forEntity=restTemplate.getForEntity("http://HOTELSERVICE/hotel/"+rating.getHotelId(), Hotel.class);
 			
-			logger.info("Response status Code: {} ",forEntity.getStatusCode());
+			Hotel hotel=hotelService.getHotel(rating.getHotelId());
 			
 			//set the hotel to rating
 			rating.setHotel(hotel);
