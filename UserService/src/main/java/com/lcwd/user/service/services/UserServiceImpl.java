@@ -51,11 +51,15 @@ public class UserServiceImpl implements UserService{
 	public User getUser(String userId) {
 		//Get user from database with the help of userRepository
 		User user = userRepository.findById(userId).orElseThrow(()->new ResourceNotFoundException("User with given Id not found: "+userId));
+		
 		//	fetch rating of the above user from Rating Service
 		// http://localhost:8083/ratings/user/8dc7fe1b-48d1-45af-8cff-61bb9ee162fa
 		
+		//Rating[] ratingsOfUser = restTemplate.getForObject("http://localhost:8083/ratings/user/"+user.getUserId(), Rating[].class);
+		//Making API Dynamic by using MicroService Name
 		
-		Rating[] ratingsOfUser = restTemplate.getForObject("http://localhost:8083/ratings/user/"+user.getUserId(), Rating[].class);
+		Rating[] ratingsOfUser = restTemplate.getForObject("http://RATINGSERVICE/ratings/user/"+user.getUserId(), Rating[].class);
+
 		logger.info("{} ",ratingsOfUser);
 		
 		List<Rating> ratings = Arrays.stream(ratingsOfUser).toList();
@@ -65,7 +69,7 @@ public class UserServiceImpl implements UserService{
 			//api call to Hotel Service to get the hotel
 			//http://localhost:8082/hotel
 			
-			ResponseEntity<Hotel> forEntity=restTemplate.getForEntity("http://localhost:8082/hotel/"+rating.getHotelId(), Hotel.class);
+			ResponseEntity<Hotel> forEntity=restTemplate.getForEntity("http://HOTELSERVICE/hotel/"+rating.getHotelId(), Hotel.class);
 			
 			Hotel hotel=forEntity.getBody();
 			
@@ -83,5 +87,4 @@ public class UserServiceImpl implements UserService{
 		
 		return user;
 	}
-
 }
